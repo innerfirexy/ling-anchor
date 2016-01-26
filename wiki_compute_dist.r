@@ -7,7 +7,7 @@ library(dplyr)
 library(lsa)
 
 df.pairs = readRDS('wiki.pairs.rds')
-dt.pairs = data.table(df.pairs, key = c('primeUtterID', 'primeUser', 'targetUtterID', 'targetUser'))
+dt.pairs = data.table(df.pairs, key = c('primeUser', 'targetUser'))
 
 dt.ub = readRDS('wiki.user.baseline.rds')
 setkey(dt.ub, key = user)
@@ -17,31 +17,64 @@ setkey(dt.ub, key = user)
 # and between target.vec and target.base
 
 # first, get all unique (utterID, user, art, auxv, ..., quant) vectors
-prime.vec = select(dt.pairs, primeUtterID, primeUser, primeArt:primeQuant)
-target.vec = select(dt.pairs, targetUtterID, targetUser, targetArt:targetQuant)
+prime.vec = select(dt.pairs, primeUtterID, primeUser, primeArt:primeQuant, targetUser)
+target.vec = select(dt.pairs, targetUtterID, targetUser, targetArt:targetQuant, primeUser)
 
-uniq.vec = unique(rbindlist(list(prime.vec, target.vec)))
-uniq.vec = rename(uniq.vec, user = primeUser)
-# colnames(uniq.vec) = c('utterID', 'user', 'art', 'auxv', 'conj', 'adv', 'ipron', 'ppron', 'prep', 'quant')
-setkey(uniq.vec, user)
+# join prime and target baseline to prime.vec
+setkey(prime.vec, primeUser)
+prime.vec = prime.vec[dt.ub, nomatch = 0]
+colnames(prime.vec) = c(colnames(prime.vec)[1:11], paste0(colnames(prime.vec)[12:19], '_pb'))
 
-# join uniq.vec with dt.ub, and compute distance between vec and base
-uniq.vec.join = uniq.vec[dt.ub]
+setkey(prime.vec, targetUser)
+prime.vec = prime.vec[dt.ub, nomatch = 0]
+colnames(prime.vec) = c(colnames(prime.vec)[1:19], paste0(colnames(prime.vec)[20:27], '_tb'))
+
+# join prime and target baseline to target.vec
+setkey(target.vec, targetUser)
+target.vec = target.vec[dt.ub, nomatch = 0]
+colnames(target.vec) = c(colnames(target.vec)[1:11], paste0(colnames(target.vec)[12:19], '_tb'))
+
+setkey(target.vec, primeUser)
+target.vec = target.vec[dt.ub, nomatch = 0]
+colnames(target.vec) = c(colnames(target.vec)[1:19], paste0(colnames(target.vec)[20:27], '_pb'))
+
+
 
 # method 1
-system.time(uniq.dist <- uniq.vec.join[, {
+system.time(prime.dist <- prime.vec[, {
         vec = as.numeric(.SD[, 3:10, with = FALSE])
-        base = as.numeric(.SD[, 11:18, with = FALSE])
-        list(primeUtterID = primeUtterID, dist = cosine(vec, base)[1,1])
-    }, by = 1:nrow(uniq.vec.join)])
+        base_self = as.numeric(.SD[, 12:19, with = FALSE])
+        base_other = as.numeric(.SD[, 20:27, with = FALSE])
+        list(primeUtterID = primeUtterID, distSelf = cosine(vec, base_self)[1,1], distOther = cosine(vec, base_other)[1,1])
+    }, by = 1:nrow(prime.vec)])
+# benchmark on brain
 # user  system elapsed 
-# 384.287   2.786 392.986 
+# 274.392   0.547 275.423
+
+system.time(target.dist <- target.vec[, {
+        vec = as.numeric(.SD[, 3:10, with = FALSE])
+        base_self = as.numeric(.SD[, 12:19, with = FALSE])
+        base_other = as.numeric(.SD[, 20:27, with = FALSE])
+        list(targetUtterID = targetUtterID, distSelf = cosine(vec, base_self)[1,1], distOther = cosine(vec, base_other)[1,1])
+    }, by = 1:nrow(target.vec)])
+
+prime.dist[, nrow := NULL]
+setkey(prime.dist, primeUtterID)
+prime.dist = rename(prime.dist, primeDistSelf = distSelf, primeDistOther = distOther)
+
+target.dist[, nrow := NULL]
+setkey(target.dist, targetUtterID)
+target.dist = rename(target.dist, targetDistSelf = distSelf, targetDistOther = distOther)
+
+# combine
+pairs.dist = cbind(prime.dist, target.dist)
+
+
 
 # method 2: use primeUtterID as the only key
-uniq.dist = 
 
-# method 3: vectorize, failed
-# cosine cannot be vectorized
 
 
 ## merge the results back to dt.pairs, 
+setkey(dt.pairs, primeUtterID)
+dt.pairs = dt.pairs[prime.dist]
