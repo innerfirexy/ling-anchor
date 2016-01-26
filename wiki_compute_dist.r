@@ -12,6 +12,11 @@ dt.pairs = data.table(df.pairs, key = c('primeUser', 'targetUser'))
 dt.ub = readRDS('wiki.user.baseline.rds')
 setkey(dt.ub, key = user)
 
+# # run once
+# ## save all rds files to julia-friendly csv files
+# write.csv(df.pairs, file = 'wiki.pairs.csv', row.names = FALSE)
+# write.csv(dt.ub, file = 'wiki.user.baseline.csv', row.names = FALSE)
+
 
 # for each line in dt.pairs, compute the distance between prime.vec and prime.base
 # and between target.vec and target.base
