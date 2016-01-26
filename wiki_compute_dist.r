@@ -50,7 +50,7 @@ system.time(prime.dist <- prime.vec[, {
         vec = as.numeric(.SD[, 3:10, with = FALSE])
         base_self = as.numeric(.SD[, 12:19, with = FALSE])
         base_other = as.numeric(.SD[, 20:27, with = FALSE])
-        list(primeUtterID = primeUtterID, distSelf = cosine(vec, base_self)[1,1], distOther = cosine(vec, base_other)[1,1])
+        list(primeUtterID = primeUtterID, primeDistSelf = cosine(vec, base_self)[1,1], primeDistOther = cosine(vec, base_other)[1,1])
     }, by = 1:nrow(prime.vec)])
 # benchmark on brain
 # user  system elapsed 
@@ -60,26 +60,22 @@ system.time(target.dist <- target.vec[, {
         vec = as.numeric(.SD[, 3:10, with = FALSE])
         base_self = as.numeric(.SD[, 12:19, with = FALSE])
         base_other = as.numeric(.SD[, 20:27, with = FALSE])
-        list(targetUtterID = targetUtterID, distSelf = cosine(vec, base_self)[1,1], distOther = cosine(vec, base_other)[1,1])
+        list(targetUtterID = targetUtterID, targetDistSelf = cosine(vec, base_self)[1,1], targetDistOther = cosine(vec, base_other)[1,1])
     }, by = 1:nrow(target.vec)])
 
 prime.dist[, nrow := NULL]
 setkey(prime.dist, primeUtterID)
-prime.dist = rename(prime.dist, primeDistSelf = distSelf, primeDistOther = distOther)
 
 target.dist[, nrow := NULL]
 setkey(target.dist, targetUtterID)
-target.dist = rename(target.dist, targetDistSelf = distSelf, targetDistOther = distOther)
 
 # combine
 pairs.dist = cbind(prime.dist, target.dist)
 
 
+# merge the results back to dt.pairs, 
+setkey(dt.pairs, primeUtterID, targetUtterID)
+dt.pairs.added = dt.pairs[pairs.dist]
 
-# method 2: use primeUtterID as the only key
-
-
-
-## merge the results back to dt.pairs, 
-setkey(dt.pairs, primeUtterID)
-dt.pairs = dt.pairs[prime.dist]
+# save to RDS
+saveRDS(dt.pairs.added, 'wiki.pairs.added.rds')
