@@ -1,4 +1,4 @@
-# Plot the content in wiki.pairs.added.local.rds
+# Plot the content in wiki.*.rds
 # Yang Xu
 # 1/27/2016
 
@@ -71,5 +71,54 @@ t.test(subset(dt, isAdmin == 'admins')$distOther,
 # admins have lower distOther than non-admins
 
 
-# examine effect of localID
+
+## effect of hedgeRatio, high vs low
+# read df.high_hr.rds and df.low_hr.rds
+df.high_hr = readRDS('df.high_hr.rds')
+df.low_hr = readRDS('df.low_hr.rds')
+
+dt.hr = subset(dt, user %in% c(df.high_hr$user, df.low_hr$user) & localID > 1)
+
+# add hr column: high vs low
+dt.hr$hr = 'low'
+dt.hr[dt.hr$user %in% df.high_hr$user, ]$hr = 'high'
+dt.hr$hr = as.factor(dt.hr$hr)
+
+# find all the convRoot that have two speakers, one of which is from high_hr, and the other from low_hr
+df.pairs = readRDS('wiki.pairs.added.local.rds')
+conv_roots = unique(subset(df.pairs, (primeUser %in% df.high_hr$user & targetUser %in% df.low_hr$user) | 
+    (primeUser %in% df.low_hr$user & targetUser %in% df.high_hr$user))$convRoot)
+
+dt.hr.sub = subset(dt.hr, convRoot %in% conv_roots)
+
+p4 = ggplot(subset(dt.hr.sub, localID <= 6 & isAdmin == 'non-admins'), aes(x = localID, y = distSelf, color = hr, lty = hr)) + 
+    stat_summary(fun.data = mean_cl_boot, geom = 'errorbar') + 
+    stat_summary(fun.y = mean, geom = 'line') + 
+    scale_x_continuous(breaks = 1:10)
+pdf('distSelf_vs_localID_hrHighLow.pdf')
+plot(p4)
+dev.off()
+
+p5 = ggplot(subset(dt.hr.sub, localID <= 6 & isAdmin == 'non-admins'), aes(x = localID, y = distOther, color = hr, lty = hr)) + 
+    stat_summary(fun.data = mean_cl_boot, geom = 'errorbar') + 
+    stat_summary(fun.y = mean, geom = 'line') + 
+    scale_x_continuous(breaks = 1:10)
+pdf('distOther_vs_localID_hrHighLow.pdf')
+plot(p5)
+dev.off()
+
+# models
+summary(lm(distOther ~ localID*hr, subset(dt.hr.sub, isAdmin == 'non-admins' & localID <= 6)))
+# low hr has smaller distOther than high hr, t = -3.419***
+# interaction t = 2.760**
+
+summary(lm(distSelf ~ localID*hr, subset(dt.hr.sub, isAdmin == 'non-admins' & localID <= 6)))
+# low hr has smaller distSelf than high hr, t = -2.779**
+# interaction t = 2.316*
+
+
+
+
+
+### examine effect of localID
 summary(lmer(distSelf ~ localID + (1|convRoot), dt)) # t = 3.9
