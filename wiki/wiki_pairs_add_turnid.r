@@ -17,9 +17,15 @@ df.db = dbGetQuery(conn, sql)
 dt.db = data.table(df.db, key = c('utteranceID', 'conversationRoot', 'replyTo'))
 
 # add localID to dt.db
-dt.db.added = dt.db[, list(utterID = utteranceID, localID = 1:.N), by = conversationRoot]
-dt.db.added[, conversationRoot:=NULL]
+dt.db.added = dt.db[, list(utterID = utteranceID, replyTo = replyTo, localID = 1:.N), by = conversationRoot]
+# make sure that in cases where localID == 1, replyTo == 0
+nrow(subset(dt.db.added, localID == 1)) # 125292
+nrow(subset(dt.db.added, localID == 1 & replyTo == 0)) # 125292, yes!
+
+dt.db.added[, conversationRoot := NULL]
+dt.db.added[, replyTo := NULL]
 setkey(dt.db.added, utterID)
+
 
 # read wiki.pairs.added.rds
 dt.pairs = readRDS('wiki.pairs.added.rds')
