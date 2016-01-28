@@ -1,0 +1,289 @@
+files <- list.files(path = './type2', pattern = '.csv')#
+speedList <- c()#
+#
+for (f in files) {#
+	df <- read.csv(file = paste0('./type2/', f), header = TRUE)#
+	d <- 0#
+	for (i in 2 : dim(df)[1]) {#
+		d = d + distance(df$x[i], df$y[i], df$x[i-1], df$y[i-1])#
+	}#
+	speedList <- c(speedList, d/(dim(df)[1]-1))#
+}#
+# function that calculates the distance#
+distance <- function(x1, y1, x2, y2) {#
+	return (sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2)))#
+}
+library('plotrix')#
+X11()#
+plot(5, 5, xlim = c(-1, 10), ylim = c(-1, 10), asp = 1)#
+abline(v = seq(0, 10, 0.5), col = 'blue', lty = 3)#
+abline(h = seq(0, 10, 0.5), col = 'blue', lty = 3)#
+draw.circle(5, 5, 5)
+install.packages('plotrix')
+library('plotrix')#
+X11()#
+plot(5, 5, xlim = c(-1, 10), ylim = c(-1, 10), asp = 1)#
+abline(v = seq(0, 10, 0.5), col = 'blue', lty = 3)#
+abline(h = seq(0, 10, 0.5), col = 'blue', lty = 3)#
+draw.circle(5, 5, 5)
+assignStatus <- function(centerX, centerY, posX, posY, statusMat) {#
+	radius <- 142.5#
+	divide <- dim(statusMat)[1]#
+	grid <- 2*radius/divide#
+	oX <- centerX - radius#
+	oY <- centerY - radius#
+	indX <- ceiling((posX - oX)/grid)#
+	indY <- ceiling((posY - oY)/grid)#
+	return (statusMat[indX, indY])#
+}
+createStatusMat <- function(divide) {#
+	radius <- divide/2#
+	mat <- matrix(0, divide, divide, byrow = TRUE)#
+#
+	statusID <- 1#
+	for (y in 1:radius) {#
+		for (x in 1:radius) {#
+			if (distance(x, y, radius, radius) < radius) {#
+				mat[y, x] <- statusID#
+				statusID = statusID + 1#
+			}#
+		}#
+		for (x in (radius + 1):divide) {#
+			if (distance(x-1, y, radius, radius) < radius) {#
+				mat[y, x] <- statusID#
+				statusID = statusID + 1#
+			}#
+		}#
+	}#
+	for (y in (radius+1):divide) {#
+		for (x in 1:radius) {#
+			if (distance(x, y-1, radius, radius) < radius) {#
+				mat[y, x] <- statusID#
+				statusID = statusID + 1#
+			}#
+		}#
+		for (x in (radius + 1):divide) {#
+			if (distance(x-1, y-1, radius, radius) < radius) {#
+				mat[y, x] <- statusID#
+				statusID = statusID + 1#
+			}#
+		}#
+	}#
+#
+	return(mat)#
+}
+statusMat
+centerX <- 208.30#
+centerY <- 200#
+#
+# create status matrix, compute the total number of status, and use it to create transition matrix#
+statusMat <- createStatusMat(20)#
+statusNum <- sum(statusMat != 0)#
+transMat <- matrix(0, statusNum, statusNum, byrow = TRUE)#
+statusSeries <- list()
+statusMat
+install.packages(pryr)
+install.packages('pryr')
+install.packages('doMC')
+install.packages('gdata')
+library('gdata')
+df.complete <- read.csv(file = 'df.win10_2sp.sample.computed.complete.csv', header = TRUE)
+ls()
+q()
+install.packages('logistic')
+install.packages('psych')
+packages.install('MSBVAR')
+install.packages('MSBVAR')
+install.packages('iterators')
+ls()
+install.packages('rbenchmark')
+?rbenchmark
+install.packages('scatterplot3d')
+install.packages('stringr')
+install.packages('zoo')
+x <- cbind(x1 = 3, x2 = c(4:1, 2:5))
+x
+dimnames(x)[[1]] <- letters[1:8]
+x
+apply(x, 2, mean, trim = .2)
+apply(x, 2, mean)
+col.sums <- apply(x, 2, sum)
+apply(x, 2, sort)
+?seq_along
+seq(5:10)
+seq(c(4,5,2,3,7,2,1))
+seq_along(c(4,5,2,3,7,2,1))
+source("/Users/yangxu/Google Drive/projects/complexity/rep_genzel/rep_genzel_ana.r")
+library('ggplot2')
+getwd()
+ls()
+library(data.table)
+DT = data.table(x=rep(c("a","b","c"),each=3), y=c(1,3,6), v=1:9)
+DT[,x]
+DT[,.(x)]
+DT[2:5,cat(v,"\n")]
+DT[2:5,]
+DT
+DT[,2,with=FALSE]
+DT[,2,with=TRUE]
+DT[,2]
+DT[,2, with = TRUE]
+DT[,2, with = FALSE]
+setkey(DT,x)
+key(DT)
+tables()
+DT['a']
+DT['b']
+DT['c']
+DT['d']
+DT[,sum(v)]
+DT[,sum(v),by=x]
+DT['a',sum(v),by=x]
+DT['a',sum(v)]
+DT[c('a', 'b'),sum(v)]
+DT[c('a', 'b'),sum(v), by = .EACHI]
+DT[c('a', 'b'),sum(v), by = .I]
+DT[c('a', 'b'),sum(v), by = .EACHI]
+X = data.table(c("b","c"),foo=c(4,2))
+tables()
+X
+DT
+DT[X]
+X[DT]
+setkey(X, V1)
+X[DT]
+DT[X]
+DT[X, sum(v), by = .EACHI]
+DT[X, mult = 'first']
+DT[X, mult = 'last']
+DT[X,sum(v)*foo,by=.EACHI]
+foo
+DT
+DT[X]
+setkey(DT,x,y)
+key(DT)
+DT['a']
+DT[list('a')]
+DT[.('a', 3)]
+DT[list('a',3:6)]
+DT['a']
+DT[.('a', 3:6), nomatch = 0]
+DT[.('a', 3:6), roll=TRUE]
+DT[, sum(v), by = .(y%%2)]
+DT[, sum(v), by = y%%2]
+DT
+DT[,.SD[2],by=x]
+DT
+DT[1]
+DT[2]
+DT[,tail(.SD,2),by=x]
+DT[,lapply(.SD,sum),by=x]
+DT[,list(MySum=sum(v),#
+         MyMin=min(v),#
+         MyMax=max(v)),#
+    by=.(x,y%%2)]
+DT
+DT[,sum(v),x]
+key(DT[,sum(v),x])
+DT[,sum(v),x][V1<20]
+DT[x<='a']
+DT[x>'a']
+DT[y==1]
+DT[v==1]
+DT[v>5]
+print(DT[,z:=42L])
+DT
+DT[,z:=NULL]
+DT
+DT["a",v:=42L]
+DT
+DT['a']
+print(DT['a', v:=42L])
+dt = DT['a', v:=42L]
+dt
+DT['a'][]
+DT["a",v:=42L][]
+DT
+DT["b",v2:=84L][]
+DT[,m:=mean(v),by=x][]
+DT[,.SD[which.min(v)],by=x][]
+DT
+DT[which.min(x)]
+DT[which.min(y)]
+DT[which.max(y)]
+DT[which(x=='a')]
+DT['a']
+DT[X]
+DT
+DT['a']
+DT[!'a']
+DT[!.("b",3)]
+DT
+DT[!.("b",1)]
+DT[x!="b" | y!=3]
+update.packages()
+ls()
+DT
+DT[,2:4]
+DT[,2:4, with=FALSE]
+DT[,.(y,v)]
+DT[,.(y:v2)]
+DT[1]
+DT[1][,.(y,v)]
+class(DT[1][,.(y,v)])
+DT[1][,.(y,v)][]
+as.numeric(DT[1][,.(y,v)])
+as.numeric(DT[1][, 2:3, with=FALSE])
+as.numeric(DT[1][, 2:3, with=TRUE])
+as.numeric(DT[1][, 2:3, with=FALSE])
+DT
+DT[X]
+DT[X, nrow(.SD[, 2:6, with = FALSE]), by = x]
+DT[X, dim(.SD), by = x]
+dim(DT)
+dim(DT[X])
+DT[X, nrow(.SD[, 1:5, with = FALSE]), by = x]
+DT[X, nrow(.SD[, 1:4, with = FALSE]), by = x]
+DT[X, dim(.SD[, 1:4, with = FALSE]), by = x]
+DT[X,sum(v)*foo,by=.EACHI]
+DT[X,nrow(.SD)*foo,by=.EACHI]
+X
+DT[X,]
+DT[X,,by=1:nrow(DT)]
+DT[X, length(.SD), by=1:nrow(DT)]
+DT[X, nrow(.SD), by=1:nrow(DT)]
+DT[X, nrow(.SD), by=1:6]
+DT[X, length(.SD), by=1:6]
+DT[X, length(.SD[,1:5]), by=1:6]
+DT[X, length(.SD[,1:5,with=F]), by=1:6]
+DT[X]
+DT[X, length(.SD[,1:5,with=F]), by=x]
+DT[X, length(.SD[,1:4,with=F]), by=x]
+DT[X, length(.SD[,1:4,with=F]), by=1:6]
+DT[X, length(.SD[,1:6,with=F]), by=1:6]
+DT[X, length(.SD[,1:5,with=F]), by=1:6]
+setwd("/Users/yangxu/GitHub/ling-anchor")
+dt = readRDS('wiki.pairs.added.rds')
+head(dt)
+DT = data.table(x=rep(c("a","b","c"),each=3), y=c(1,3,6), v=1:9)
+library(data.table)
+DT = data.table(x=rep(c("a","b","c"),each=3), y=c(1,3,6), v=1:9)
+X = data.table(c("b","c"),foo=c(4,2))
+X
+key(X)
+setkey(DT,x)
+tables()
+DT
+DT[X]
+DT[X,sum(v),by=.EACHI]
+DT[X,sum(foo),by=.EACHI]
+DT[X, foo,by=.EACHI]
+Y = data.table(c('b', 'b', 'c', 'c'), foo=c(5,3))
+T
+Y
+DT[Y]
+DT[Y, sum(v), by=.EACHI]
+getwd()
+ls()
+head(dt)
+q()
