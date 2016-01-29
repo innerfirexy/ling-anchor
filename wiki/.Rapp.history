@@ -1,0 +1,19 @@
+install.packages('doMC')
+library(R.utils)
+install.packages(R.utils)
+install.packages("R.utils")
+library(R.utils)
+df = readRDS('rds/df.pairs.anchor.rds')
+getwd()
+library(R.utils)
+library(data.table)
+setwd('/Users/yvx5085/projects/ling-anchor/wiki')
+dt = readRDS('wiki.user.baseline.rds')
+head(dt)
+summary(dt)
+acos(0)
+acos(0)/pi
+acos(1)/pi
+acos(-.5)
+acos(-.5)/pi
+acos(-1)/pi

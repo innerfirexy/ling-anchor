@@ -18,7 +18,7 @@ colnames(dt.all) = c('utterID', 'user', 'art', 'auxv', 'conj', 'adv', 'ipron', '
 dt.agg = dt.all[, lapply(.SD, mean), by = user, .SDcols = 3:10]
 
 # save to rds
-saveRDS(dt.agg, 'dt.user.style.baseline.rds')
+saveRDS(dt.agg, 'wiki.user.baseline.rds')
 
 # plot dt.agg
 hist(dt.agg$auxv)
