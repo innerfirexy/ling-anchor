@@ -74,8 +74,8 @@ t.test(subset(dt, isAdmin == 'admins')$distOther,
 
 ## effect of hedgeRatio, high vs low
 # read df.high_hr.rds and df.low_hr.rds
-df.high_hr = readRDS('df.high_hr.rds')
-df.low_hr = readRDS('df.low_hr.rds')
+df.high_hr = readRDS('wiki.high_hr.rds')
+df.low_hr = readRDS('wiki.low_hr.rds')
 
 dt.hr = subset(dt, user %in% c(df.high_hr$user, df.low_hr$user) & localID > 1)
 
